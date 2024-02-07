@@ -1,0 +1,31 @@
+springdoc:
+  swagger-ui:
+    tagsSorter: alpha
+    path: /swagger-ui.html
+
+spring:
+  config:
+    import:
+      - core-db.yml
+      - core-domain.yml
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+slack:
+  error-webhook-key: ${SLACK_ERROR_WEBHOOK_KEY}
+
+---
+spring.config.activate.on-profile: local
+
+---
+spring.config.activate.on-profile: dev
+
+---
+spring.config.activate.on-profile: prod

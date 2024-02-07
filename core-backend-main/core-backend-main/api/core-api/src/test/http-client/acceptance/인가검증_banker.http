@@ -1,0 +1,58 @@
+### 회원 로그인
+< {%
+    client.global.set("username", "banker001")
+    client.global.set("password", "1234")
+
+    request.variables.set("username", client.global.get("username"))
+    request.variables.set("password", client.global.get("password"))
+%}
+POST {{host}}/api/v1/auth/signin
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.test("회원 로그인 - 200", function () {
+        client.assert(response.status === 200, response.status);
+    });
+
+    client.global.set("userRoleToken", response.body["accessToken"])
+%}
+
+
+### ROLE_STUDENT 권한이 필요한 api 호출
+# @no-cookie-jar
+GET {{host}}/test/api/v1/auth/student
+Authorization: Bearer {{userRoleToken}}
+
+> {%
+    client.test("ROLE_STUDENT 권한이 필요한 api 호출 - 200", function () {
+        client.assert(response.status === 200, response.status + ", userRoleToken=" + client.global.get("userRoleToken"));
+    });
+%}
+
+
+### ROLE_BANKER 권한이 필요한 api 호출
+GET {{host}}/test/api/v1/auth/banker
+Authorization: Bearer {{userRoleToken}}
+
+> {%
+    client.test("ROLE_BANKER 권한이 필요한 api 호출 - 200", function () {
+        client.assert(response.status === 200, response.status + ", userRoleToken=" + client.global.get("userRoleToken"));
+    });
+%}
+
+
+### ROLE_TEACHER 권한이 필요한 api 호출
+# @no-cookie-jar
+GET {{host}}/test/api/v1/auth/teacher
+Authorization: Bearer {{userRoleToken}}
+
+> {%
+    client.test("ROLE_TEACHER 권한이 필요한 api 호출 - 403", function () {
+        client.assert(response.status === 403);
+    });
+%}

@@ -1,0 +1,180 @@
+###
+< {%
+    client.global.set("testName", "CREDIT_EVALUATOR 회원 로그인 api")
+
+    client.global.set("creditEvaluatorUsername", "credit001")
+    client.global.set("creditEvaluatorPassword", "1234")
+
+    request.variables.set("creditEvaluatorUsername", client.global.get("creditEvaluatorUsername"))
+    request.variables.set("creditEvaluatorPassword", client.global.get("creditEvaluatorPassword"))
+%}
+POST {{host}}/api/v1/auth/signin
+Content-Type: application/json
+
+{
+  "username": "{{creditEvaluatorUsername}}",
+  "password": "{{creditEvaluatorPassword}}"
+}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200, response.status);
+    });
+
+    client.global.set("creditEvaluatorToken", response.body["accessToken"])
+%}
+
+###
+< {%
+    client.global.set("testName", "개인 회원 평가 api - userUsername == user002, +3 점")
+%}
+POST {{host}}/api/v1/credit-evaluation/user002
+Authorization: Bearer {{creditEvaluatorToken}}
+Content-Type: application/json
+
+{
+  "changePoint": 3,
+  "description": "우수 고객 +3 점"
+}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200);
+    });
+%}
+
+###
+< {%
+    client.global.set("testName", "개인 회원 평가 api - userUsername == user002, +5 점")
+%}
+POST {{host}}/api/v1/credit-evaluation/user002
+Authorization: Bearer {{creditEvaluatorToken}}
+Content-Type: application/json
+
+{
+  "changePoint": 5,
+  "description": "우수 고객 +5 점"
+}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200);
+    });
+%}
+
+###
+< {%
+    client.global.set("testName", "개인 회원 평가 api - userUsername == user002, -2 점")
+%}
+POST {{host}}/api/v1/credit-evaluation/user002
+Authorization: Bearer {{creditEvaluatorToken}}
+Content-Type: application/json
+
+{
+  "changePoint": -2,
+  "description": "벌점 -2 점"
+}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200);
+    });
+%}
+
+###
+< {%
+    client.global.set("testName", "이력 조회 api - userUsername == user002")
+%}
+GET {{host}}/api/v1/credit-evaluation/history?username=user002&fromAt=2022-07-30T23:45:10&toAt=2024-07-30T23:59:10
+Authorization: Bearer {{creditEvaluatorToken}}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200);
+    });
+%}
+
+###
+< {%
+    client.global.set("testName", "user002 회원 로그인 api")
+%}
+POST {{host}}/api/v1/auth/signin
+Content-Type: application/json
+
+{
+  "username": "user002",
+  "password": "1234"
+}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200, response.status);
+    });
+
+    client.global.set("user002Token", response.body["accessToken"])
+%}
+
+###
+< {%
+    client.global.set("testName", "내 신용평가 이력 조회 api - userUsername == user002")
+%}
+GET {{host}}/api/v1/my/credit-evaluation/history?username=user002&fromAt=2022-07-30T23:45:10&toAt=2024-07-30T23:59:10
+Authorization: Bearer {{user002Token}}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200);
+    });
+%}
+
+###
+< {%
+    client.global.set("testName", "개인 회원 초기화 api - userUsername == user002")
+%}
+POST {{host}}/api/v1/credit-evaluation/user002/reset
+Authorization: Bearer {{creditEvaluatorToken}}
+Content-Type: application/json
+
+{
+  "basePoint": 70,
+  "description": "70점 초기화 테스트"
+}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200);
+    });
+%}
+
+###
+< {%
+    client.global.set("testName", "teacher 회원 로그인 api")
+%}
+POST {{host}}/api/v1/auth/signin
+Content-Type: application/json
+
+{
+  "username": "teacher001",
+  "password": "1234"
+}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200, response.status);
+    });
+
+    client.global.set("teacherToken", response.body["accessToken"])
+%}
+
+###
+< {%
+    client.global.set("testName", "신용평가 이력 조회 api - userUsername == teacher001")
+%}
+GET {{host}}/api/v1/credit-evaluation/history/by-teacher?fromAt=2022-07-30T23:45:10&toAt=2024-07-30T23:59:10
+Authorization: Bearer {{teacherToken}}
+
+> {%
+    client.test(client.global.get("testName") + " - 200", function () {
+        client.assert(response.status === 200);
+    });
+%}
