@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/core-backend-main/core-backend-main" />
+        <option name="gradleJvm" value="17" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/core-backend-main/core-backend-main" />
+            <option value="$PROJECT_DIR$/core-backend-main/core-backend-main/api" />
+            <option value="$PROJECT_DIR$/core-backend-main/core-backend-main/api/core-api" />
+            <option value="$PROJECT_DIR$/core-backend-main/core-backend-main/db" />
+            <option value="$PROJECT_DIR$/core-backend-main/core-backend-main/db/core-db" />
+            <option value="$PROJECT_DIR$/core-backend-main/core-backend-main/domain" />
+            <option value="$PROJECT_DIR$/core-backend-main/core-backend-main/domain/core-domain" />
+            <option value="$PROJECT_DIR$/core-backend-main/core-backend-main/domain/model-domain" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
